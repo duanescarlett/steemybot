@@ -1,0 +1,3 @@
+1 check transaction for received amount and memo
+2 calculate vote power and delay
+3 send upvote and or resteem

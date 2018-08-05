@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  web:
+    restart: always
+    build: .
+    container_name: guniWebLocal
+    ports:
+      - "80:5000"
+    volumes:
+      - .:/app
+    #command: python app.py
+    environment:
+      - PYTHONUNBUFFERED=0
+
+

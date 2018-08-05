@@ -1,0 +1,29 @@
+version: '3'
+services:
+
+  web:
+    restart: always
+    build: .
+    container_name: guniWeb
+    expose:
+      - 8000
+    volumes:
+      - .:/app
+    command: gunicorn -w 1 -b :8000 app:app
+    environment:
+      - PYTHONUNBUFFERED=0
+
+  nginx:
+    container_name: Nginx
+    restart: always
+    build: ./nginx
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - web:web
+    volumes:
+      - ./nginx:/etc/nginx
+    environment:
+      - ENV=development
+      - APPLICATION_URL=http://web
