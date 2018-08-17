@@ -12,6 +12,8 @@ services:
     command: gunicorn --bind 0.0.0.0:5000 wsgi:app
     ports:
       - 5000:5000
+#    depends_on:
+#      - nginx
     environment:
       - PYTHONUNBUFFERED=0
     networks:
@@ -28,9 +30,19 @@ services:
       - web:web
     volumes:
       - ./nginx:/etc/nginx
+    depends_on:
+      - web
     environment:
       - ENV=production
       - APPLICATION_URL=http://web
+    networks:
+      - innernetwork
+
+  redis:
+    container_name: Redis
+    image: redis
+    ports:
+      - 63790:6379
     networks:
       - innernetwork
 

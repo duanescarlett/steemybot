@@ -6,20 +6,25 @@ from steem.post import Post
 from steem.account import Account
 from steem.steem import Commit
 from steem import Steem
-#from redis import Redis, RedisError
+from redis import Redis, RedisError
 
 
 class Ops:
 
+    redis_server = Redis(host='localhost', port=6379, db=0)
+    steem_nodes = ['https://api.steemit.com',
+                   'https://rpc.buildteam.io',
+                   'https://steemd.minnowsupportproject.org']
 
     # instance attribute
     def __init__(self):
 
-        steem_nodes = ['https://api.steemit.com',
-                       'https://rpc.buildteam.io',
-                       'https://steemd.minnowsupportproject.org']
+        # redis_server = StrictRedis(host='localhost', port=6379, db=0)
+        # steem_nodes = ['https://api.steemit.com',
+        #                'https://rpc.buildteam.io',
+        #                'https://steemd.minnowsupportproject.org']
 
-        self.s = Steem(nodes=steem_nodes, keys=['5KAnYvEubpkgG1ooAQWyKzzYmhagE4jUvNpTiJocrvvGDDEjRz2',
+        self.s = Steem(nodes=self.steem_nodes, keys=['5KAnYvEubpkgG1ooAQWyKzzYmhagE4jUvNpTiJocrvvGDDEjRz2',
                              '5JKUi7X7VM7AUQVVijA8xTiy15stBRj4WFbshTh6yBYCTKur49g'])
 
     def lastTransaction(self):
@@ -87,62 +92,66 @@ class Ops:
                         timestamp = transfer.get("timestamp")
                         transId = transfer.get("trx_id")
 
-                        coin = amount.split(" ")
-                        # Put memo into the database
-                        #self.redis_server.set(memo, memo)
-                        print(coin[1])  # Print the amount
-                        crypcoin = float(coin[0])  # Crypto value
-                        cryptoType = coin[1]  # Crypto type
-
-                        post.reply(
-                            "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD and get an upvote. Join my discord server for a free upvote for each post. <br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
-                            "", "steemybot")
-
-                        if cryptoType == "STEEM":
-                            print("This is steem")
-                            # print("Amount Sent => " + crypcoin)
-                            # Calculate vote power based on amount sent
-                            if crypcoin < 1.000:
-                                # get a voting weight between 80 and 100
-                                vote_weight = float(random.randint(+10, +40))
-                                # Upvote the post
-                                post.commit.vote(post.identifier, vote_weight, account="steemybot")
-
-                            elif crypcoin >= 1.000 and crypcoin < 3.000:
-                                # get a voting weight between 80 and 100
-                                vote_weight = float(random.randint(+40, +60))
-                                # Upvote the post
-                                post.commit.vote(post.identifier, vote_weight, account="steemybot")
-
-                            elif crypcoin >= 3.000:
-                                # get a voting weight
-                                vote_weight = float(random.randint(+60, +95))
-                                # Upvote the post
-                                post.commit.vote(post.identifier, vote_weight, account="steemybot")
-
-
-                        elif cryptoType == "SBD":
-                            print("This is SBD")
-                            # print("Amount Sent => " + crypcoin)
-
-                            # Calculate vote power based on amount sent
-                            if crypcoin < 1.000:
-                                # get a voting weight between 80 and 100
-                                vote_weight = float(random.randint(+10, +40))
-                                # Upvote the post
-                                post.commit.vote(post.identifier, vote_weight, account="steemybot")
-                            elif crypcoin >= 1.000 and crypcoin < 3.000:
-                                # get a voting weight between 80 and 100
-                                vote_weight = float(random.randint(+40, +60))
-                                # Upvote the post
-                                post.commit.vote(post.identifier, vote_weight, account="steemybot")
-                            elif crypcoin >= 3.000:
-                                # get a voting weight between 80 and 100
-                                vote_weight = float(random.randint(+60, +95))
-                                # Upvote the post
-                                post.commit.vote(post.identifier, vote_weight, account="steemybot")
+                        if self.redis_server.get(memo):
+                            print("Already upvoted this post")
+                            continue
                         else:
-                            print("Nothing Happened, I wonder why")
+                            coin = amount.split(" ")
+                            # Put memo into the database
+                            self.redis_server.set(memo, memo)
+                            print(coin[1])  # Print the amount
+                            crypcoin = float(coin[0])  # Crypto value
+                            cryptoType = coin[1]  # Crypto type
+
+                            post.reply(
+                                "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD and get an upvote. Join my discord server for a free upvote for each post. <br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
+                                "", "steemybot")
+
+                            if cryptoType == "STEEM":
+                                print("This is steem")
+                                # print("Amount Sent => " + crypcoin)
+                                # Calculate vote power based on amount sent
+                                if crypcoin < 1.000:
+                                    # get a voting weight between 80 and 100
+                                    vote_weight = float(random.randint(+10, +40))
+                                    # Upvote the post
+                                    post.commit.vote(post.identifier, vote_weight, account="steemybot")
+
+                                elif crypcoin >= 1.000 and crypcoin < 3.000:
+                                    # get a voting weight between 80 and 100
+                                    vote_weight = float(random.randint(+40, +60))
+                                    # Upvote the post
+                                    post.commit.vote(post.identifier, vote_weight, account="steemybot")
+
+                                elif crypcoin >= 3.000:
+                                    # get a voting weight
+                                    vote_weight = float(random.randint(+60, +95))
+                                    # Upvote the post
+                                    post.commit.vote(post.identifier, vote_weight, account="steemybot")
+
+
+                            elif cryptoType == "SBD":
+                                print("This is SBD")
+                                # print("Amount Sent => " + crypcoin)
+
+                                # Calculate vote power based on amount sent
+                                if crypcoin < 1.000:
+                                    # get a voting weight between 80 and 100
+                                    vote_weight = float(random.randint(+10, +40))
+                                    # Upvote the post
+                                    post.commit.vote(post.identifier, vote_weight, account="steemybot")
+                                elif crypcoin >= 1.000 and crypcoin < 3.000:
+                                    # get a voting weight between 80 and 100
+                                    vote_weight = float(random.randint(+40, +60))
+                                    # Upvote the post
+                                    post.commit.vote(post.identifier, vote_weight, account="steemybot")
+                                elif crypcoin >= 3.000:
+                                    # get a voting weight between 80 and 100
+                                    vote_weight = float(random.randint(+60, +95))
+                                    # Upvote the post
+                                    post.commit.vote(post.identifier, vote_weight, account="steemybot")
+                            else:
+                                print("Nothing Happened, I wonder why")
 
                         # #Check to see if memo is in the database
                         # if self.redis_server.get(transfer.get("memo")):
