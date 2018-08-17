@@ -11,7 +11,7 @@ from redis import Redis, RedisError
 
 class Ops:
 
-    redis_server = Redis(host='localhost', port=6379, db=0)
+    redis_server = Redis(host='127.0.0.1', port=6379, db=0)
     steem_nodes = ['https://api.steemit.com',
                    'https://rpc.buildteam.io',
                    'https://steemd.minnowsupportproject.org']
