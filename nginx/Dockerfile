@@ -9,5 +9,4 @@ ADD steemy.conf /etc/nginx/conf.d/
 RUN rm /etc/nginx/mime.types
 ADD mime.types /etc/nginx/
 
-COPY ./static ./static
 
