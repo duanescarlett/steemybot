@@ -1,31 +1,27 @@
 import random
 import time
+import psycopg2
 
 from steem.blockchain import Blockchain
 from steem.post import Post
 from steem.account import Account
 from steem.steem import Commit
 from steem import Steem
-from redis import Redis, RedisError
-
+from flask import request
 
 class Ops:
 
-    redis_server = Redis(host='localhost', port=6379, db=0)
     steem_nodes = ['https://api.steemit.com',
                    'https://rpc.buildteam.io',
                    'https://steemd.minnowsupportproject.org']
 
-    # instance attribute
-    def __init__(self):
 
-        # redis_server = StrictRedis(host='localhost', port=6379, db=0)
-        # steem_nodes = ['https://api.steemit.com',
-        #                'https://rpc.buildteam.io',
-        #                'https://steemd.minnowsupportproject.org']
+    def __init__(self, db, User):
 
         self.s = Steem(nodes=self.steem_nodes, keys=['5KAnYvEubpkgG1ooAQWyKzzYmhagE4jUvNpTiJocrvvGDDEjRz2',
                              '5JKUi7X7VM7AUQVVijA8xTiy15stBRj4WFbshTh6yBYCTKur49g'])
+        self.db = db
+        self.user = User
 
     def lastTransaction(self):
         acc = Account("steemybot", steemd_instance=self.s)
@@ -92,16 +88,20 @@ class Ops:
                         timestamp = transfer.get("timestamp")
                         transId = transfer.get("trx_id")
 
-                        if self.redis_server.get(memo):
+                        # if self.redis_server.get(memo):
+                        if memo == self.user.query.filter_by(memo=memo):
                             print("Already upvoted this post")
                             continue
                         else:
                             coin = amount.split(" ")
-                            # Put memo into the database
-                            self.redis_server.set(memo, memo)
                             print(coin[1])  # Print the amount
                             crypcoin = float(coin[0])  # Crypto value
                             cryptoType = coin[1]  # Crypto type
+
+                            # Init and put memo into the database
+                            data = self.user(sender, memo, block, timestamp, transId, amount, cryptoType)
+                            self.db.session.add(data)
+                            self.db.session.commit()
 
                             post.reply(
                                 "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD and get an upvote. Join my discord server for a free upvote for each post. <br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
@@ -152,14 +152,6 @@ class Ops:
                                     post.commit.vote(post.identifier, vote_weight, account="steemybot")
                             else:
                                 print("Nothing Happened, I wonder why")
-
-                        # #Check to see if memo is in the database
-                        # if self.redis_server.get(transfer.get("memo")):
-                        #     # send message saying that post has already been upvoted and send money back if
-                        #     # steemy got paid
-                        #     print("Already upvoted this post: " + str(self.redis_server.get(transfer.get("memo"))))
-                        #     continue
-                        # else:
 
                     except ValueError as e:
                         if 'Invalid identifier' == e.args[0]:

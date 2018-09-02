@@ -12,12 +12,16 @@ services:
     environment:
       - PYTHONUNBUFFERED=0
 
-
-  redis:
-    container_name: Redis
-    image: redis
-    ports:
-      - 6379:6379
+  db:
+    image: postgres
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    restart: always
+    environment:
+      PGDATA: "/var/lib/postgresql/data"
+      POSTGRES_DB: "steemydata"
+      POSTGRES_PASSWORD: "LX:954Dos#"
+      POSTGRES_USER: "duane.dos"
     networks:
       - innernetwork
 

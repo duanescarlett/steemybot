@@ -1,17 +1,44 @@
 import time
+import psycopg2
 from flask import Flask
-#from redis import Redis, RedisError
+from flask_sqlalchemy import SQLAlchemy
 
 import os
 import socket
 
-# Connect to Redis
 from ops import Ops
 
 app = Flask(__name__)
 app.debug = True
 
-steemOps = Ops()
+# Setup SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://duane.dos:LX:954Dos#@localhost:5432/steemydata';
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender = db.Column(db.String(120), unique=False)
+    memo = db.Column(db.String(120), unique=True)
+    block = db.Column(db.String(120), unique=True)
+    time = db.Column(db.String(120), unique=True)
+    trans_id = db.Column(db.String(120), unique=True)
+    amount = db.Column(db.String(120), unique=True)
+    ctype = db.Column(db.String(120), unique=False)
+
+    def __init__(self, sender, memo, block, time, trans_id, amount, ctype):
+        #self.id = id
+        self.sender = sender
+        self.memo = memo
+        self.block = block
+        self.time = time
+        self.trans_id = trans_id
+        self.amount = amount
+        self.ctype = ctype
+
+    def __repr__(self):
+        return '<Transaction %>' % self.trans_id
+
+steemOps = Ops(db, User)
 
 def startBlockchain():
     print(steemOps.lastTransaction())

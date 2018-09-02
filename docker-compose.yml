@@ -38,13 +38,25 @@ services:
     networks:
       - innernetwork
 
-  redis:
-    container_name: Redis
-    image: redis
-#    ports:
-#      - 6379:6379
+  db:
+    image: postgres
+#    volumes:
+#      - ./pgData/init:/var/lib/postgresql/data
+    volumes:
+      - ./pgData/init:/docker-entrypoint-initdb.d/
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      PGDATA: "/var/lib/postgresql/data"
+      POSTGRES_DB: "steemydata"
+      POSTGRES_PASSWORD: "LX:954Dos#"
+      POSTGRES_USER: "duane.dos"
     networks:
       - innernetwork
 
 networks:
   innernetwork:
+
+volumes:
+  pgData:
