@@ -1,6 +1,5 @@
 import random
 import time
-import psycopg2
 
 from steem.blockchain import Blockchain
 from steem.post import Post
@@ -15,13 +14,11 @@ class Ops:
                    'https://rpc.buildteam.io',
                    'https://steemd.minnowsupportproject.org']
 
-
-    def __init__(self, db, User):
+    def __init__(self, redis_store):
 
         self.s = Steem(nodes=self.steem_nodes, keys=['5KAnYvEubpkgG1ooAQWyKzzYmhagE4jUvNpTiJocrvvGDDEjRz2',
                              '5JKUi7X7VM7AUQVVijA8xTiy15stBRj4WFbshTh6yBYCTKur49g'])
-        self.db = db
-        self.user = User
+        self.data = redis_store
 
     def lastTransaction(self):
         acc = Account("steemybot", steemd_instance=self.s)
@@ -89,7 +86,7 @@ class Ops:
                         transId = transfer.get("trx_id")
 
                         # if self.redis_server.get(memo):
-                        if memo == self.user.query.filter_by(memo=memo):
+                        if self.data.get(memo):
                             print("Already upvoted this post")
                             continue
                         else:
@@ -99,9 +96,7 @@ class Ops:
                             cryptoType = coin[1]  # Crypto type
 
                             # Init and put memo into the database
-                            data = self.user(sender, memo, block, timestamp, transId, amount, cryptoType)
-                            self.db.session.add(data)
-                            self.db.session.commit()
+                            self.data.set(memo, memo)
 
                             post.reply(
                                 "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD and get an upvote. Join my discord server for a free upvote for each post. <br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",

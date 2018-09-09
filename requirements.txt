@@ -1,6 +1,5 @@
 Flask
-flask_sqlalchemy
-psycopg2-binary
-aiohttp
+Redis
+socket
 websockets
 Gunicorn

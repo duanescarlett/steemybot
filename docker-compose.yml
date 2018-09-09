@@ -13,7 +13,9 @@ services:
     ports:
       - 5000:5000
 #    depends_on:
-#      - nginx
+#      - db
+    links:
+      - db:Redis_db
     environment:
       - PYTHONUNBUFFERED=0
     networks:
@@ -39,19 +41,14 @@ services:
       - innernetwork
 
   db:
-    image: postgres
-#    volumes:
-#      - ./pgData/init:/var/lib/postgresql/data
+#    image: "redis"
+    build: ./redis
+    container_name: Redis_db
     volumes:
-      - ./pgData/init:/docker-entrypoint-initdb.d/
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
     ports:
-      - "5432:5432"
-    restart: always
-    environment:
-      PGDATA: "/var/lib/postgresql/data"
-      POSTGRES_DB: "steemydata"
-      POSTGRES_PASSWORD: "LX:954Dos#"
-      POSTGRES_USER: "duane.dos"
+      - 6379:6379
     networks:
       - innernetwork
 
