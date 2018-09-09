@@ -1,5 +1,3 @@
 Flask
 Redis
-socket
-websockets
 Gunicorn
