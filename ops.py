@@ -155,7 +155,7 @@ class Ops:
                             continue
 
                 print("Sleeping for 3 seconds")
-                time.sleep(10)
+                time.sleep(3)
 
     def upVote(self, permalink, weight, user):
         post = Post(permalink)
