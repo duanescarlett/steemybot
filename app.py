@@ -17,10 +17,10 @@ def startBlockchain():
     return steemOps.listenForTrans()
     # steemOps.run()
 
-@app.route("/freevote/<string:memo1>/<string:memo2>/<string:memo3>/<string:memo4>/")
-def freev(memo1, memo2, memo3, memo4):
-    memo = memo1 + '/' + memo2 + '/' + memo3 + '/' + memo4 + '/'
-    steemOps.freePost(memo)
+@app.route("/freevote/<string:memo1>")
+def freev(memo1):
+    #memo = memo1 + '/' + memo2 + '/' + memo3 + '/' + memo4 + '/'
+    steemOps.freePost(memo1)
     return memo
 
 @app.route("/")

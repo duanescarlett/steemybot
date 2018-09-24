@@ -47,26 +47,20 @@ class Ops:
         memo = "https://" + memo
         post = Post(memo)
 
-        # get a voting weight between 80 and 100
-        vote_weight = float(random.randint(+5, +15))
-        # Upvote the post
-        post.commit.vote(post.identifier, vote_weight, account="steemybot")
-        print("I ran")
-
         # Check to see if memo is in the database
-        # if self.redis_server.get(memo):
-        #     #continue
-        #     # send message saying that post has already been upvoted and send money back if
-        #     # steemy got paid
-        #
-        #     print("Already upvoted this post")
-        # else:
-        #     self.redis_server.set(memo, memo)
-        #     # get a voting weight between 80 and 100
-        #     vote_weight = float(random.randint(+5, +15))
-        #     # Upvote the post
-        #     post.commit.vote(post.identifier, vote_weight, account="steemybot")
-        #     print("I ran")
+        if self.data.get(memo):
+            #continue
+            # send message saying that post has already been upvoted and send money back if
+            # steemy got paid
+
+            print("Already upvoted this post")
+        else:
+            self.data.set(memo, memo)
+            # get a voting weight between 80 and 100
+            vote_weight = float(random.randint(+5, +9))
+            # Upvote the post
+            post.commit.vote(post.identifier, vote_weight, account="steemybot")
+            print("I ran")
 
     def listenForTrans(self):
         while True:
@@ -157,39 +151,39 @@ class Ops:
                 print("Sleeping for 3 seconds")
                 time.sleep(3)
 
-    def upVote(self, permalink, weight, user):
-        post = Post(permalink)
-        post.upvote(weight, user)
+    # def upVote(self, permalink, weight, user):
+    #     post = Post(permalink)
+    #     post.upvote(weight, user)
 
-    def refund(self, acc, amount, sbdorsteem, memoText, sender):
+    # def refund(self, acc, amount, sbdorsteem, memoText, sender):
+    #
+    #     Commit.transfer(
+    #         acc,
+    #         amount,
+    #         sbdorsteem,
+    #         memo=memoText,
+    #         account=sender
+    #     )
 
-        Commit.transfer(
-            acc,
-            amount,
-            sbdorsteem,
-            memo=memoText,
-            account=sender
-        )
-
-    def run(self):
-        # upvote posts with 30% weight
-        upvote_pct = 30
-        whoami = 'duane.dos'
-
-        # stream comments as they are published on the blockchain
-        # turn them into convenient Post objects while we're at it
-        b = Blockchain()
-        stream = map(Post, b.stream(filter_by=['comment']))
-
-        try:
-
-            for post in stream:
-                if post.json_metadata:
-                    mentions = post.json_metadata.get('users', [])
-
-                    # if post mentions more than 10 people its likely spam
-                    if mentions and len(mentions) < 10:
-                        post.upvote(weight=upvote_pct, voter=whoami)
-
-        except Exception:
-            print("Post array search complete")
+    # def run(self):
+    #     # upvote posts with 30% weight
+    #     upvote_pct = 30
+    #     whoami = 'duane.dos'
+    #
+    #     # stream comments as they are published on the blockchain
+    #     # turn them into convenient Post objects while we're at it
+    #     b = Blockchain()
+    #     stream = map(Post, b.stream(filter_by=['comment']))
+    #
+    #     try:
+    #
+    #         for post in stream:
+    #             if post.json_metadata:
+    #                 mentions = post.json_metadata.get('users', [])
+    #
+    #                 # if post mentions more than 10 people its likely spam
+    #                 if mentions and len(mentions) < 10:
+    #                     post.upvote(weight=upvote_pct, voter=whoami)
+    #
+    #     except Exception:
+    #         print("Post array search complete")
