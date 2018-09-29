@@ -62,7 +62,9 @@ class Ops:
             post.commit.vote(post.identifier, vote_weight, account="steemybot")
             print("I ran")
             post.reply(
-                "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD and get an upvote. Join my discord server for a free upvote for each post. <br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
+                "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD "
+                "and get an upvote. Join my discord server for free weighted upvoting for each post, just put the command !upvote before the web address of the post and you will get a free upvote within 2 mins."
+                "<br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
                 "", "steemybot")
 
     def listenForTrans(self):
@@ -96,7 +98,9 @@ class Ops:
                             self.data.set(memo, memo)
 
                             post.reply(
-                                "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD and get an upvote. Join my discord server for a free upvote for each post. <br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
+                                "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD "
+                                "and get an upvote. Join my discord server for free weighted upvoting for each post, just put the command !upvote before the web address of the post and you will get a free upvote within 2 mins."
+                                "<br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
                                 "", "steemybot")
 
                             if cryptoType == "STEEM":
