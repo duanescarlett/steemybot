@@ -4,6 +4,7 @@ import time
 from steem.blockchain import Blockchain
 from steem.post import Post
 from steem.account import Account
+
 from steem.steem import Commit
 from steem import Steem
 from flask import request
@@ -26,13 +27,8 @@ class Ops:
         # print(steemd)
         return steemd
 
-    # def poster(self):
-    #     self.s.commit.post(
-    #         "Automation services on the steem blockchain",
-    #         "This is a test post created by my new bot. This bot will have multiple services like upvote and resteem. More details are coming soon.",
-    #         "duane.dos",
-    #         tags=["test", ]
-    #     )
+    def refund(self, to, amount, asset, memo='', account=None):
+        self.s.transfer(to, amount, asset, memo, account)
 
     def comment(self, post, link):
         post(
@@ -72,7 +68,7 @@ class Ops:
             transfers = self.lastTransaction()
             for transfer in transfers:
                 if transfer["to"] != "steemybot":
-                    print("This is a empty transfer " + transfer["to"])
+                    #This transfer does not belong to steemybot
                     continue
                 else:
                     try:
@@ -84,22 +80,32 @@ class Ops:
                         timestamp = transfer.get("timestamp")
                         transId = transfer.get("trx_id")
 
-                        # if self.redis_server.get(memo):
+                        # Parse string for coin type
+                        coin = amount.split(" ")
+                        print(coin[1])  # Print the amount
+                        crypcoin = float(coin[0])  # Crypto value
+                        cryptoType = coin[1]  # Crypto type
+
                         if self.data.get(memo):
                             print("Already upvoted this post")
+                            # Give a refund
+                            refund(sender, float(amount), crypcoin, memo, "steemybot"):
+                            post.reply(
+                                "You received a refund from Steemy Bot, your post was already upvoted",
+                                "", "steemybot")
                             continue
                         else:
-                            coin = amount.split(" ")
-                            print(coin[1])  # Print the amount
-                            crypcoin = float(coin[0])  # Crypto value
-                            cryptoType = coin[1]  # Crypto type
+                            # coin = amount.split(" ")
+                            # print(coin[1])  # Print the amount
+                            # crypcoin = float(coin[0])  # Crypto value
+                            # cryptoType = coin[1]  # Crypto type
 
                             # Init and put memo into the database
                             self.data.set(memo, memo)
 
                             post.reply(
                                 "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD "
-                                "and get an upvote. Join my discord server for free weighted upvoting for each post, just put the command !upvote before the web address of the post and you will get a free upvote within 2 mins."
+                                "and get an upvote. Join my discord server discord.gg/MEBXbbY for free weighted upvoting for each post, just put the command !upvote before the web address of the post and you will get a free upvote within 2 mins."
                                 "<br><br>@steemybot our mission is to support high quality posts which will raise the value of the STEEM Blockchain.",
                                 "", "steemybot")
 
@@ -158,39 +164,3 @@ class Ops:
                 print("Sleeping for 3 seconds")
                 time.sleep(3)
 
-    # def upVote(self, permalink, weight, user):
-    #     post = Post(permalink)
-    #     post.upvote(weight, user)
-
-    # def refund(self, acc, amount, sbdorsteem, memoText, sender):
-    #
-    #     Commit.transfer(
-    #         acc,
-    #         amount,
-    #         sbdorsteem,
-    #         memo=memoText,
-    #         account=sender
-    #     )
-
-    # def run(self):
-    #     # upvote posts with 30% weight
-    #     upvote_pct = 30
-    #     whoami = 'duane.dos'
-    #
-    #     # stream comments as they are published on the blockchain
-    #     # turn them into convenient Post objects while we're at it
-    #     b = Blockchain()
-    #     stream = map(Post, b.stream(filter_by=['comment']))
-    #
-    #     try:
-    #
-    #         for post in stream:
-    #             if post.json_metadata:
-    #                 mentions = post.json_metadata.get('users', [])
-    #
-    #                 # if post mentions more than 10 people its likely spam
-    #                 if mentions and len(mentions) < 10:
-    #                     post.upvote(weight=upvote_pct, voter=whoami)
-    #
-    #     except Exception:
-    #         print("Post array search complete")
