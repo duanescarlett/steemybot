@@ -89,7 +89,7 @@ class Ops:
                         if self.data.get(memo):
                             print("Already upvoted this post")
                             # Give a refund
-                            refund(sender, float(amount), crypcoin, memo, "steemybot"):
+                            #refund(sender, float(amount), crypcoin, memo, "steemybot"):
                             post.reply(
                                 "You received a refund from Steemy Bot, your post was already upvoted",
                                 "", "steemybot")
