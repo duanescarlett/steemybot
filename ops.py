@@ -86,13 +86,17 @@ class Ops:
                         crypcoin = float(coin[0])  # Crypto value
                         cryptoType = coin[1]  # Crypto type
 
+                        if not memo:
+                            self.s.transfer(sender, float(amount), crypcoin, "Your memo is empty, here is your refund",
+                                            "steemybot")
+
                         if self.data.get(memo):
                             print("Already upvoted this post")
                             # Give a refund
-                            #refund(sender, float(amount), crypcoin, memo, "steemybot"):
-                            post.reply(
-                                "You received a refund from Steemy Bot, your post was already upvoted",
-                                "", "steemybot")
+                            self.refund(sender, float(amount), crypcoin, memo, "steemybot")
+                            # post.reply(
+                            #     "You received a refund from Steemy Bot, your post was already upvoted",
+                            #     "", "steemybot")
                             continue
                         else:
                             # coin = amount.split(" ")
@@ -102,6 +106,8 @@ class Ops:
 
                             # Init and put memo into the database
                             self.data.set(memo, memo)
+                            # Set transaction ID to prove that post was already upvoted
+                            self.data.set(transId, transId)
 
                             post.reply(
                                 "This post was upvoted by @steemybot, Send at least 0.01 STEEM or SBD "
@@ -159,7 +165,17 @@ class Ops:
                         if 'Invalid identifier' == e.args[0]:
                             print("Invalid post link. Consider a refund. [%s]" %
                                   transfer.get("memo"))
-                            continue
+
+                            if self.data(transfer.get("trx_id")):
+                                continue
+                            else:
+                                amount = transfer.get("amount")
+                                coin = amount.split(" ")
+                                crypcoin = float(coin[0])
+
+                                self.s.transfer(transfer.get("from"), crypcoin, coin[1], "Your memo is empty, here is your refund",
+                                       "steemybot")
+
 
                 print("Sleeping for 3 seconds")
                 time.sleep(3)
